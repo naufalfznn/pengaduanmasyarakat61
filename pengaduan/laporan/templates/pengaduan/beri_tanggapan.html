@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Berikan Tanggapan</title>
+</head>
+<body>
+    <h2>Beri Tanggapan untuk Pengaduan</h2>
+    <p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan }}</p>
+    <p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
+    <p><strong>Status:</strong> {{ pengaduan.status }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Kirim Tanggapan</button>
+    </form>
+
+    <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard</a>
+</body>
+</html>

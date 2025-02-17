@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Buat Akun Petugas</title>
+</head>
+<body>
+
+<h2>Buat Akun Petugas</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Simpan</button>
+</form>
+
+<a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard</a>
+
+</body>
+</html>

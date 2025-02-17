@@ -1,0 +1,25 @@
+<h2>Daftar Pengaduan</h2>
+<table border="1">
+    <tr>
+        <th>No</th>
+        <th>Tanggal</th>
+        <th>Isi Laporan</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+    {% for p in pengaduan %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.tgl_pengaduan }}</td>
+        <td>{{ p.isi_laporan }}</td>
+        <td>{{ p.status }}</td>
+        <td>
+            <a href="{% url 'detail_pengaduan' p.id_pengaduan %}">Lihat Detail</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">Belum ada pengaduan.</td>
+    </tr>
+    {% endfor %}
+</table>

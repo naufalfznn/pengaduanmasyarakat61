@@ -1,0 +1,50 @@
+<h2>Detail Pengaduan</h2>
+<p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan }}</p>
+<p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
+<p><strong>Status:</strong> {{ pengaduan.status }}</p>
+<p><strong>Foto Bukti:</strong></p>
+{% if pengaduan.foto %}
+    <img src="{{ pengaduan.foto.url }}" width="300">
+{% else %}
+    <p>Tidak ada foto bukti.</p>
+{% endif %}
+
+
+{% if request.session.user_role == "admin" or request.session.user_role == "petugas" %}
+    <form method="POST" action="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}">
+        {% csrf_token %}
+        <label for="status">Ubah Status:</label>
+        <select name="status" id="status">
+            <option value="tunggu" {% if pengaduan.status == "tunggu" %}selected{% endif %}>Tunggu</option>
+            <option value="proses" {% if pengaduan.status == "proses" %}selected{% endif %}>Proses</option>
+            <option value="selesai" {% if pengaduan.status == "selesai" %}selected{% endif %}>Selesai</option>
+        </select>
+        <button type="submit">Update</button>
+    </form>
+{% endif %}
+
+<h3>Tanggapan</h3>
+{% if pengaduan.tanggapan_set.all %}
+    {% for tanggapan in pengaduan.tanggapan_set.all %}
+        <p><strong>{{ tanggapan.tgl_tanggapan }}:</strong> {{ tanggapan.tanggapan }}</p>
+        {% if tanggapan.id_petugas %}
+            <p><em>Ditanggapi oleh Petugas: {{ tanggapan.id_petugas.nama_petugas }}</em></p>
+        {% elif tanggapan.id_admin %}
+            <p><em>Ditanggapi oleh Admin: {{ tanggapan.id_admin.username }}</em></p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>Belum ada tanggapan.</p>
+{% endif %}
+
+{% if request.session.user_role == "admin" or request.session.user_role == "petugas" %}
+    <a href="{% url 'beri_tanggapan' pengaduan.id_pengaduan %}">Beri Tanggapan</a>
+{% endif %}
+
+{% if request.session.user_role == "admin" %}
+    <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard</a>
+{% elif request.session.user_role == "petugas" %}
+    <a href="{% url 'dashboard_petugas' %}">Kembali ke Dashboard</a>
+{% else %}
+    <a href="{% url 'dashboard_masyarakat' %}">Kembali ke Dashboard</a>
+{% endif %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Buat Pengaduan</title>
+</head>
+<body>
+    <h2>Buat Pengaduan Baru</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Kategori Laporan:</label>
+        {{ form.kategori }}
+
+        <label>Lokasi Kejadian:</label>
+        {{ form.lokasi }}
+
+        <label>Isi Laporan:</label>
+        {{ form.isi_laporan }}
+
+        <label>Upload Foto Bukti (Opsional):</label>
+        {{ form.foto }}
+
+        <button type="submit">Kirim Pengaduan</button>
+    </form>
+
+    <p><a href="{% url 'dashboard_masyarakat' %}">Kembali ke Dashboard</a></p>
+</body>
+</html>

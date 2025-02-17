@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Petugas</title>
+</head>
+<body>
+
+<h2>Dashboard Petugas</h2>
+<p>Selamat datang, {{ request.session.username }}! <a href="{% url 'logout' %}"> Logout</a></p>
+
+<h3>Daftar Pengaduan</h3>
+<table border="1">
+    <tr>
+        <th>No</th>
+        <th>NIK</th>
+        <th>Isi Laporan</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+    {% for pengaduan in pengaduan_list %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ pengaduan.nik.nik }}</td>
+        <td>{{ pengaduan.isi_laporan }}</td>
+        <td>{{ pengaduan.status }}</td>
+        <td>
+            <a href="{% url 'detail_pengaduan' pengaduan.id_pengaduan %}">Lihat</a> |
+            <a href="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}">Ubah Status</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
