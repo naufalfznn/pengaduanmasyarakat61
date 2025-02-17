@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% if user.is_authenticated %}
-    {% if user.role == 'admin' %}
-        {% include 'includes/navbar_admin.html' %}
-    {% elif user.role == 'petugas' %}
-        {% include 'includes/navbar_petugas.html' %}
-    {% elif user.role == 'masyarakat' %}
-        {% include 'includes/navbar_masyarakat.html' %}
-    {% endif %}
-{% else %}
-    {% include 'includes/navbar_public.html' %}
-{% endif %}
     <title>Dashboard Admin</title>
 </head>
 <body>
 
+    {% if role == 'admin' %}
+    {% include 'includes/navbar_admin.html' %}
+        {% elif role == 'petugas' %}
+            {% include 'includes/navbar_petugas.html' %}
+        {% elif role == 'masyarakat' %}
+            {% include 'includes/navbar_masyarakat.html' %}
+        {% else %}
+            {% include 'includes/navbar_public.html' %}
+        {% endif %}
 <h2>Dashboard Administrator</h2>
 <p>Selamat datang, {{ request.session.username }}! <a href="{% url 'logout' %}"> Logout</a></p>
 

@@ -14,7 +14,22 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 
 def homepage(request):
-    return render(request, 'homepage.html')
+    role = "public"  # Default untuk yang belum login
+
+    if request.user.is_authenticated:
+        username = request.user.username
+
+        # Cek apakah user adalah masyarakat
+        if Masyarakat.objects.filter(username=username).exists():
+            role = "masyarakat"
+        # Cek apakah user adalah petugas
+        elif Petugas.objects.filter(username=username).exists():
+            role = "petugas"
+        # Cek apakah user adalah admin
+        elif Administrator.objects.filter(username=username).exists():
+            role = "admin"
+
+    return render(request, 'homepage.html', {'role': role})
 
 def register(request):
     if request.method == 'POST':
@@ -76,23 +91,41 @@ def logout_view(request):
     return redirect('homepage')
 
 def dashboard_admin(request):
-    if 'user_role' in request.session and request.session['user_role'] == 'admin':
+    if request.session.get('user_role') == 'admin':
         pengaduan_list = Pengaduan.objects.all()
-        return render(request, 'dashboard/admin_dashboard.html', {'pengaduan_list': pengaduan_list})
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+        return render(request, 'dashboard/admin_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role
+        })
+    
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
 def dashboard_petugas(request):
-    if 'user_role' in request.session and request.session['user_role'] == 'petugas':
+    if request.session.get('user_role') == 'petugas':
         pengaduan_list = Pengaduan.objects.all()
-        return render(request, 'dashboard/petugas_dashboard.html', {'pengaduan_list': pengaduan_list})
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+        return render(request, 'dashboard/petugas_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role
+        })
+    
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
 def dashboard_masyarakat(request):
     if 'user_role' in request.session and request.session['user_role'] == 'masyarakat':
         pengaduan_list = Pengaduan.objects.filter(nik=request.session['user_id'])
-        return render(request, 'dashboard/masyarakat_dashboard.html', {'pengaduan_list': pengaduan_list})
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+        return render(request, 'dashboard/masyarakat_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role  # Kirim ke template
+        })
+    messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+    return redirect('login')
+
+
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
