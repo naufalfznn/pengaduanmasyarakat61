@@ -18,6 +18,9 @@ from django.db.models import Count
 import matplotlib
 matplotlib.use('Agg') 
 from collections import Counter
+from django.db.models.functions import TruncDate
+from django.utils import timezone
+
 
 
 def homepage(request):
@@ -151,10 +154,6 @@ def dashboard_masyarakat(request):
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
-
-    messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
-    return redirect('login')
-
 def buat_pengaduan(request):
     if 'user_role' not in request.session or request.session['user_role'] != 'masyarakat':
         messages.error(request, "Anda harus login sebagai masyarakat untuk membuat pengaduan.")
@@ -165,7 +164,7 @@ def buat_pengaduan(request):
         if form.is_valid():
             pengaduan = form.save(commit=False)
             pengaduan.nik = Masyarakat.objects.get(nik=request.session['user_id'])
-            pengaduan.tgl_pengaduan = datetime.date.today()
+            pengaduan.tgl_pengaduan = timezone.now()
             pengaduan.status = 'tunggu'
             pengaduan.save()
             messages.success(request, "Pengaduan berhasil dikirim!")
@@ -194,8 +193,6 @@ def ubah_status_pengaduan(request, id_pengaduan):
             messages.success(request, "Status pengaduan berhasil diperbarui.")
         else:
             messages.error(request, "Status tidak valid.")  # ❌ Jika ada error input
-
-    return redirect('detail_pengaduan', id_pengaduan=id_pengaduan)
 
     return redirect('detail_pengaduan', id_pengaduan=id_pengaduan)
 
@@ -323,12 +320,6 @@ def export_pengaduan_excel(request):
     response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.xlsx"'
     df.to_excel(response, index=False)
     return response
-
-from django.db.models import Count
-from django.db.models.functions import TruncDate
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
 
 def kelola_akun(request):
     if 'user_role' not in request.session or request.session['user_role'] != 'admin':

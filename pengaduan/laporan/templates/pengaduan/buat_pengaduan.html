@@ -5,24 +5,88 @@
     <title>Buat Pengaduan</title>
 </head>
 <body>
+
     <h2>Buat Pengaduan Baru</h2>
+    <hr>
+
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <label>Kategori Laporan:</label>
-        {{ form.kategori }}
 
-        <label>Lokasi Kejadian:</label>
-        {{ form.lokasi }}
+        <fieldset>
+            <legend>Informasi Pengaduan</legend>
 
-        <label>Isi Laporan:</label>
-        {{ form.isi_laporan }}
+            <label for="kategori">Kategori Laporan:</label><br>
+            {{ form.kategori }}
+            <br><br>
 
-        <label>Upload Foto Bukti (Opsional):</label>
-        {{ form.foto }}
+            <div id="kategori_lainnya_field" style="display: none;">
+                <label for="kategori_lainnya">Masukkan Kategori Lainnya:</label><br>
+                <input type="text" name="kategori_lainnya" id="kategori_lainnya" placeholder="Masukkan kategori lainnya">
+                <br><br>
+            </div>
+
+            <label for="lokasi">Lokasi Kejadian:</label><br>
+            {{ form.lokasi }}
+            <br><br>
+
+            <label for="isi_laporan">Isi Laporan:</label><br>
+            {{ form.isi_laporan }}
+            <br><br>
+        </fieldset>
+
+        <hr>
+
+        <fieldset>
+            <legend>Bukti Pendukung</legend>
+            <label for="foto">Upload Foto Bukti (Opsional):</label><br>
+            {{ form.foto }}
+            <br><br>
+        </fieldset>
+
+        <hr>
 
         <button type="submit">Kirim Pengaduan</button>
     </form>
 
     <p><a href="{% url 'dashboard_masyarakat' %}">Kembali ke Dashboard</a></p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var kategoriDropdown = document.getElementById("kategori");
+            var kategoriLainnyaField = document.getElementById("kategori_lainnya_field");
+            var kategoriLainnyaInput = document.getElementById("kategori_lainnya");
+
+            if (!kategoriDropdown || !kategoriLainnyaInput) return;
+
+            // Pastikan kategori awal adalah "Infrastruktur"
+            for (let i = 0; i < kategoriDropdown.options.length; i++) {
+                if (kategoriDropdown.options[i].value === "infrastruktur") {
+                    kategoriDropdown.selectedIndex = i;
+                    break;
+                }
+            }
+
+            // Cek saat halaman dimuat, apakah "Lainnya" sudah dipilih
+            if (kategoriDropdown.value === "lainnya") {
+                kategoriLainnyaField.style.display = "block";
+                kategoriLainnyaInput.required = true;
+            }
+
+            // Event listener untuk menampilkan input kategori lainnya
+            kategoriDropdown.addEventListener("change", function () {
+                if (kategoriDropdown.value === "lainnya") {
+                    kategoriLainnyaField.style.display = "block";
+                    kategoriLainnyaInput.style.display = "inline-block"; // Pastikan bisa diketik
+                    kategoriLainnyaInput.required = true;
+                    kategoriLainnyaInput.removeAttribute("disabled");
+                } else {
+                    kategoriLainnyaField.style.display = "none";
+                    kategoriLainnyaInput.required = false;
+                    kategoriLainnyaInput.value = "";
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

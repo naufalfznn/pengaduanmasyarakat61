@@ -60,11 +60,12 @@ class Pengaduan(models.Model):
     ]
 
     id_pengaduan = models.AutoField(primary_key=True)
-    tgl_pengaduan = models.DateField(auto_now_add=True)
+    tgl_pengaduan = models.DateTimeField(auto_now_add=True)  # Tanggal & Waktu otomatis
     nik = models.ForeignKey('Masyarakat', on_delete=models.CASCADE, db_column='nik')  
     isi_laporan = models.TextField()
     foto = models.ImageField(upload_to='pengaduan_foto/', blank=True, null=True)  
     kategori = models.CharField(max_length=20, choices=KATEGORI_CHOICES, default='lainnya')
+    kategori_lainnya = models.CharField(max_length=100, blank=True, null=True)  # Input manual untuk kategori
     lokasi = models.CharField(max_length=255, default="Tidak diketahui") 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='tunggu')
 
@@ -72,8 +73,8 @@ class Pengaduan(models.Model):
         db_table = 'pengaduan'
 
     def __str__(self):
-        return f"{self.nik.nama} - {self.kategori} - {self.status}"
-
+        kategori_display = self.kategori if self.kategori != 'lainnya' else self.kategori_lainnya
+        return f"{self.nik.nama} - {kategori_display} - {self.status}"
 
 class Tanggapan(models.Model):
     id_tanggapan = models.AutoField(primary_key=True)

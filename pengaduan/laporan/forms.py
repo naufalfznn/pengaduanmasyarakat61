@@ -24,14 +24,36 @@ class LoginForm(forms.Form):
 
 # ✅ Form Pengaduan
 class PengaduanForm(forms.ModelForm):
+    kategori_lainnya = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'id': 'kategori_lainnya', 'style': 'display:none;', 'placeholder': 'Masukkan kategori lainnya'})
+    )
+
     class Meta:
         model = Pengaduan
-        fields = ['kategori', 'lokasi', 'isi_laporan', 'foto']
+        fields = ['kategori', 'kategori_lainnya', 'isi_laporan', 'foto', 'lokasi']
         widgets = {
-            'isi_laporan': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Tuliskan laporan Anda'}),
-            'lokasi': forms.TextInput(attrs={'placeholder': 'Masukkan lokasi'}),
+            'kategori': forms.Select(attrs={'id': 'kategori'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(PengaduanForm, self).__init__(*args, **kwargs)
+
+        # Pastikan kategori default adalah "Infrastruktur"
+        if 'infrastruktur' in dict(self.fields['kategori'].choices).keys():
+            self.fields['kategori'].initial = 'infrastruktur'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        kategori = cleaned_data.get('kategori')
+        kategori_lainnya = cleaned_data.get('kategori_lainnya')
+
+        # Validasi: Jika "Lainnya" dipilih, kategori_lainnya harus diisi
+        if kategori == 'lainnya' and not kategori_lainnya:
+            self.add_error('kategori_lainnya', "Silakan isi kategori lainnya.")
+
+        return cleaned_data
+    
 # ✅ Form Pembuatan Petugas (Admin bisa buat petugas)
 class PetugasForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
