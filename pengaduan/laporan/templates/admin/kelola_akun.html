@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kelola Akun</title>
+</head>
+<body>
+    <h2>Kelola Akun Pengguna</h2>
+
+    <h3>Jumlah Pengguna</h3>
+    <p>Total Masyarakat: {{ jumlah_masyarakat }}</p>
+    <p>Total Petugas: {{ jumlah_petugas }}</p>
+
+    <h3>Grafik Laporan Pengaduan</h3>
+    <img src="data:image/png;base64,{{ grafik_pengaduan }}" alt="Grafik Pengaduan">
+
+    <h3>Daftar Masyarakat</h3>
+    <table border="1">
+        <tr>
+            <th>NIK</th>
+            <th>Nama</th>
+            <th>Username</th>
+            <th>No Telp</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+        {% for masyarakat in masyarakat_list %}
+        <tr>
+            <td>{{ masyarakat.nik }}</td>
+            <td>{{ masyarakat.nama }}</td>
+            <td>{{ masyarakat.username }}</td>
+            <td>{{ masyarakat.telp }}</td>
+            <td>{% if masyarakat.is_active %}
+                Aktif
+              {% else %}
+                Nonaktif
+              {% endif %}</td>
+            <td>
+                <a href="{% url 'ubah_status_akun' 'masyarakat' masyarakat.nik %}">
+                    {% if masyarakat.is_active %}
+                        Nonaktifkan
+                    {% else %}
+                        Aktifkan
+                    {% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Daftar Petugas</h3>
+    <table border="1">
+        <tr>
+            <th>ID Petugas</th>
+            <th>Nama</th>
+            <th>Username</th>
+            <th>No Telp</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+        {% for petugas in petugas_list %}
+        <tr>
+            <td>{{ petugas.id_petugas }}</td>
+            <td>{{ petugas.nama_petugas }}</td>
+            <td>{{ petugas.username }}</td>
+            <td>{{ petugas.telp }}</td>
+            <td>{% if petugas.is_active %}
+                Aktif
+              {% else %}
+                Nonaktif
+              {% endif %}</td>
+            <td>
+                <a href="{% url 'ubah_status_akun' 'petugas' petugas.id_petugas %}">
+                    {% if petugas.is_active %}
+                        Nonaktifkan
+                    {% else %}
+                        Aktifkan
+                    {% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard</a>
+</body>
+</html>

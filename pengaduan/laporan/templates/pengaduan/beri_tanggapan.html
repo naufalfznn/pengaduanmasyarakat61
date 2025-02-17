@@ -16,6 +16,12 @@
         <button type="submit">Kirim Tanggapan</button>
     </form>
 
-    <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard</a>
+    {% if user.is_staff %}
+        <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard Admin</a>
+    {% elif user.role == 'petugas' %}
+        <a href="{% url 'dashboard_petugas' %}">Kembali ke Dashboard Petugas</a>
+    {% else %}
+        <a href="{% url 'homepage' %}">Kembali ke Beranda</a>
+    {% endif %}
 </body>
 </html>

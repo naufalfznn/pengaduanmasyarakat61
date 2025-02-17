@@ -6,10 +6,21 @@
     <title>Pengaduan Masyarakat</title>
 </head>
 <body>
+
+    {% if user.is_authenticated %}
+        {% if user.role == "masyarakat" %}
+            {% include 'includes/navbar_masyarakat.html' %}
+        {% elif user.role == "petugas" %}
+            {% include 'includes/navbar_petugas.html' %}
+        {% elif user.role == "admin" %}
+            {% include 'includes/navbar_admin.html' %}
+        {% endif %}
+    {% else %}
+        {% include 'includes/navbar_public.html' %}
+    {% endif %}
+
     <h1>Selamat Datang di Sistem Pengaduan Masyarakat</h1>
     <p>Silakan masuk atau daftar untuk mengakses layanan.</p>
 
-    <a href="{% url 'login' %}">Login</a> |
-    <a href="{% url 'register' %}">Register</a>
 </body>
 </html>

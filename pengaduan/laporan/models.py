@@ -6,6 +6,7 @@ class Masyarakat(models.Model):
     username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=32)
     telp = models.CharField(max_length=13)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         managed = False 
@@ -28,14 +29,14 @@ class Administrator(models.Model):
     def __str__(self):
         return self.nama_admin
 
-from django.db import models
-
 class Petugas(models.Model):
     id_petugas = models.AutoField(primary_key=True)
     nama_petugas = models.CharField(max_length=100)
     username = models.CharField(max_length=25, unique=True)
-    password = models.CharField(max_length=64)  # Hash password menggunakan SHA-256
+    password = models.CharField(max_length=64) 
     telp = models.CharField(max_length=13)
+    role = models.CharField(max_length=50, default='petugas')
+    is_active = models.BooleanField(default=True)  
 
     class Meta:
         db_table = 'petugas'

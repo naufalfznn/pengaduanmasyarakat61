@@ -12,9 +12,31 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
+import matplotlib.pyplot as plt
+import base64
+from django.db.models import Count
+import matplotlib
+matplotlib.use('Agg') 
+from collections import Counter
+
 
 def homepage(request):
-    return render(request, 'homepage.html')
+    role = "public"  # Default untuk yang belum login
+
+    if request.user.is_authenticated:
+        username = request.user.username
+
+        # Cek apakah user adalah masyarakat
+        if Masyarakat.objects.filter(username=username).exists():
+            role = "masyarakat"
+        # Cek apakah user adalah petugas
+        elif Petugas.objects.filter(username=username).exists():
+            role = "petugas"
+        # Cek apakah user adalah admin
+        elif Administrator.objects.filter(username=username).exists():
+            role = "admin"
+
+    return render(request, 'homepage.html', {'role': role})
 
 def register(request):
     if request.method == 'POST':
@@ -76,23 +98,60 @@ def logout_view(request):
     return redirect('homepage')
 
 def dashboard_admin(request):
-    if 'user_role' in request.session and request.session['user_role'] == 'admin':
+    if request.session.get('user_role') == 'admin':
+        # Ambil semua pengaduan
         pengaduan_list = Pengaduan.objects.all()
-        return render(request, 'dashboard/admin_dashboard.html', {'pengaduan_list': pengaduan_list})
+
+        # Ambil data pengaduan per hari
+        pengaduan_per_hari = Pengaduan.objects.values('tgl_pengaduan').annotate(count=Count('id_pengaduan')).order_by('tgl_pengaduan')
+
+        # Menyiapkan data untuk grafik
+        tanggal_pengaduan = [str(item['tgl_pengaduan']) for item in pengaduan_per_hari]
+        jumlah_per_hari = [item['count'] for item in pengaduan_per_hari]
+
+        # Ambil total jumlah masyarakat dan petugas
+        total_masyarakat = Masyarakat.objects.count()
+        total_petugas = Petugas.objects.count()
+
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+
+        # Kirim data ke template
+        return render(request, 'dashboard/admin_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role,
+            'total_masyarakat': total_masyarakat,
+            'total_petugas': total_petugas,
+            'tanggal_pengaduan': tanggal_pengaduan,
+            'jumlah_per_hari': jumlah_per_hari
+        })
+    
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
 def dashboard_petugas(request):
-    if 'user_role' in request.session and request.session['user_role'] == 'petugas':
+    if request.session.get('user_role') == 'petugas':
         pengaduan_list = Pengaduan.objects.all()
-        return render(request, 'dashboard/petugas_dashboard.html', {'pengaduan_list': pengaduan_list})
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+        return render(request, 'dashboard/petugas_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role
+        })
+    
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
 def dashboard_masyarakat(request):
     if 'user_role' in request.session and request.session['user_role'] == 'masyarakat':
         pengaduan_list = Pengaduan.objects.filter(nik=request.session['user_id'])
-        return render(request, 'dashboard/masyarakat_dashboard.html', {'pengaduan_list': pengaduan_list})
+        role = request.session.get('user_role', 'public')  # Ambil role dari session
+        return render(request, 'dashboard/masyarakat_dashboard.html', {
+            'pengaduan_list': pengaduan_list,
+            'role': role  # Kirim ke template
+        })
+    messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+    return redirect('login')
+
+
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
@@ -187,8 +246,7 @@ def buat_petugas(request):
 
     return render(request, 'admin/buat_petugas.html', {'form': form})
 
-from .models import Tanggapan
-from .forms import TanggapanForm
+
 
 def beri_tanggapan(request, id_pengaduan):
     if 'user_role' not in request.session or request.session['user_role'] not in ['admin', 'petugas']:
@@ -265,3 +323,74 @@ def export_pengaduan_excel(request):
     response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.xlsx"'
     df.to_excel(response, index=False)
     return response
+
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+
+def kelola_akun(request):
+    if 'user_role' not in request.session or request.session['user_role'] != 'admin':
+        messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+        return redirect('login')
+
+    masyarakat_list = Masyarakat.objects.all()
+    petugas_list = Petugas.objects.all()
+    jumlah_masyarakat = Masyarakat.objects.count()
+    jumlah_petugas = Petugas.objects.count()
+
+    # 📊 Grafik Pengaduan per Hari
+    # TruncDate digunakan untuk mengelompokkan pengaduan berdasarkan tanggal
+    pengaduan_per_hari = Pengaduan.objects.annotate(date=TruncDate('tanggal_pengaduan')) \
+                                          .values('date') \
+                                          .annotate(count=Count('date')) \
+                                          .order_by('date')
+
+    # Menyusun data untuk grafik
+    dates = [item['date'] for item in pengaduan_per_hari]
+    counts = [item['count'] for item in pengaduan_per_hari]
+
+    # Membuat grafik garis
+    fig, ax = plt.subplots()
+    ax.plot(dates, counts, marker='o', color='b', label='Pengaduan per Hari')
+    ax.set_xlabel('Tanggal')
+    ax.set_ylabel('Jumlah Pengaduan')
+    ax.set_title('Grafik Pengaduan per Hari')
+    ax.grid(True)
+    ax.legend()
+
+    # Menyimpan grafik ke dalam buffer sebagai PNG
+    buffer = BytesIO()
+    plt.xticks(rotation=45)  # Agar tanggal tidak saling bertumpuk
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+
+    return render(request, 'admin/kelola_akun.html', {
+        'masyarakat_list': masyarakat_list,
+        'petugas_list': petugas_list,
+        'jumlah_masyarakat': jumlah_masyarakat,
+        'jumlah_petugas': jumlah_petugas,
+        'grafik_pengaduan': image_base64
+    })
+
+def ubah_status_akun(request, role, user_id):
+    if 'user_role' not in request.session or request.session['user_role'] != 'admin':
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('login')
+
+    if role == "masyarakat":
+        user = get_object_or_404(Masyarakat, nik=user_id)
+    elif role == "petugas":
+        user = get_object_or_404(Petugas, id_petugas=user_id)
+    else:
+        messages.error(request, "Role tidak valid.")
+        return redirect('kelola_akun')
+
+    user.is_active = not user.is_active
+    user.save()
+    messages.success(request, f"Akun {role} {user.username} telah {'diaktifkan' if user.is_active else 'dinonaktifkan'}.")
+
+    return redirect('kelola_akun')
