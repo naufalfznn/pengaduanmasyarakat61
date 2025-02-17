@@ -220,8 +220,7 @@ def buat_petugas(request):
 
     return render(request, 'admin/buat_petugas.html', {'form': form})
 
-from .models import Tanggapan
-from .forms import TanggapanForm
+
 
 def beri_tanggapan(request, id_pengaduan):
     if 'user_role' not in request.session or request.session['user_role'] not in ['admin', 'petugas']:
