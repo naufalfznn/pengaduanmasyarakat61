@@ -15,6 +15,9 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import base64
 from django.db.models import Count
+import matplotlib
+matplotlib.use('Agg') 
+from collections import Counter
 
 
 def homepage(request):
@@ -96,11 +99,30 @@ def logout_view(request):
 
 def dashboard_admin(request):
     if request.session.get('user_role') == 'admin':
+        # Ambil semua pengaduan
         pengaduan_list = Pengaduan.objects.all()
+
+        # Ambil data pengaduan per hari
+        pengaduan_per_hari = Pengaduan.objects.values('tgl_pengaduan').annotate(count=Count('id_pengaduan')).order_by('tgl_pengaduan')
+
+        # Menyiapkan data untuk grafik
+        tanggal_pengaduan = [str(item['tgl_pengaduan']) for item in pengaduan_per_hari]
+        jumlah_per_hari = [item['count'] for item in pengaduan_per_hari]
+
+        # Ambil total jumlah masyarakat dan petugas
+        total_masyarakat = Masyarakat.objects.count()
+        total_petugas = Petugas.objects.count()
+
         role = request.session.get('user_role', 'public')  # Ambil role dari session
+
+        # Kirim data ke template
         return render(request, 'dashboard/admin_dashboard.html', {
             'pengaduan_list': pengaduan_list,
-            'role': role
+            'role': role,
+            'total_masyarakat': total_masyarakat,
+            'total_petugas': total_petugas,
+            'tanggal_pengaduan': tanggal_pengaduan,
+            'jumlah_per_hari': jumlah_per_hari
         })
     
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
@@ -302,6 +324,12 @@ def export_pengaduan_excel(request):
     df.to_excel(response, index=False)
     return response
 
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+
 def kelola_akun(request):
     if 'user_role' not in request.session or request.session['user_role'] != 'admin':
         messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
@@ -312,16 +340,29 @@ def kelola_akun(request):
     jumlah_masyarakat = Masyarakat.objects.count()
     jumlah_petugas = Petugas.objects.count()
 
-    # 📊 Grafik Status Pengaduan
-    status_counts = Pengaduan.objects.values('status').annotate(count=Count('status'))
-    labels = [s['status'] for s in status_counts]
-    values = [s['count'] for s in status_counts]
+    # 📊 Grafik Pengaduan per Hari
+    # TruncDate digunakan untuk mengelompokkan pengaduan berdasarkan tanggal
+    pengaduan_per_hari = Pengaduan.objects.annotate(date=TruncDate('tanggal_pengaduan')) \
+                                          .values('date') \
+                                          .annotate(count=Count('date')) \
+                                          .order_by('date')
 
+    # Menyusun data untuk grafik
+    dates = [item['date'] for item in pengaduan_per_hari]
+    counts = [item['count'] for item in pengaduan_per_hari]
+
+    # Membuat grafik garis
     fig, ax = plt.subplots()
-    ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')
+    ax.plot(dates, counts, marker='o', color='b', label='Pengaduan per Hari')
+    ax.set_xlabel('Tanggal')
+    ax.set_ylabel('Jumlah Pengaduan')
+    ax.set_title('Grafik Pengaduan per Hari')
+    ax.grid(True)
+    ax.legend()
 
+    # Menyimpan grafik ke dalam buffer sebagai PNG
     buffer = BytesIO()
+    plt.xticks(rotation=45)  # Agar tanggal tidak saling bertumpuk
     plt.savefig(buffer, format='png')
     buffer.seek(0)
     image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')

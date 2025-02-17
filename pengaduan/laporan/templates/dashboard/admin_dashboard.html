@@ -97,14 +97,33 @@
 <script>
     var ctx = document.getElementById('grafikPengaduan').getContext('2d');
     var chart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',  // Menggunakan tipe grafik garis
         data: {
-            labels: ["Belum Diproses", "Sedang Diproses", "Selesai"],
+            labels: {{ tanggal_pengaduan|safe }},  // Data tanggal pengaduan
             datasets: [{
-                label: 'Jumlah Pengaduan',
-                data: [{{ jumlah_tunggu }}, {{ jumlah_proses }}, {{ jumlah_selesai }}],
-                backgroundColor: ['orange', 'blue', 'green']
+                label: 'Jumlah Pengaduan per Hari',
+                data: {{ jumlah_per_hari|safe }},  // Data jumlah pengaduan per hari
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: false,  // Tidak mengisi area di bawah garis
+                tension: 0.1
             }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Tanggal'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Jumlah Pengaduan'
+                    }
+                }
+            }
         }
     });
 </script>
