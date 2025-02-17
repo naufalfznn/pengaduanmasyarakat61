@@ -4,39 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Library Chart.js -->
 </head>
 <body>
 
-    {% if role == 'admin' %}
-    {% include 'includes/navbar_admin.html' %}
-        {% elif role == 'petugas' %}
-            {% include 'includes/navbar_petugas.html' %}
-        {% elif role == 'masyarakat' %}
-            {% include 'includes/navbar_masyarakat.html' %}
-        {% else %}
-            {% include 'includes/navbar_public.html' %}
-        {% endif %}
-<h2>Dashboard Administrator</h2>
-<p>Selamat datang, {{ request.session.username }}! <a href="{% url 'logout' %}"> Logout</a></p>
+    {% if request.session.user_role == 'admin' %}
+        {% include 'includes/navbar_admin.html' %}
+    {% elif request.session.user_role == 'petugas' %}
+        {% include 'includes/navbar_petugas.html' %}
+    {% elif request.session.user_role == 'masyarakat' %}
+        {% include 'includes/navbar_masyarakat.html' %}
+    {% else %}
+        {% include 'includes/navbar_public.html' %}
+    {% endif %}
 
-<h3>Kelola Akun</h3>
+<h2>Dashboard Administrator</h2>
+<p>Selamat datang, <strong>{{ request.session.username }}</strong>!  
+   <a href="{% url 'logout' %}">Logout</a>
+</p>
+
+<h3>📌 Statistik Pengguna</h3>
 <ul>
-    <li><a href="{% url 'buat_petugas' %}">Tambah Petugas</a></li>
+    <li>Total Masyarakat: <strong>{{ total_masyarakat }}</strong></li>
+    <li>Total Petugas: <strong>{{ total_petugas }}</strong></li>
 </ul>
 
-<h3>Generate Laporan</h3>
+<h3>📌 Kelola Akun</h3>
+<ul>
+    <li><a href="{% url 'buat_petugas' %}">Tambah Petugas</a></li>
+    <li><a href="{% url 'kelola_akun' %}">Kelola Akun Pengguna</a></li>
+</ul>
+
+<h3>📌 Generate Laporan</h3>
 <ul>
     <li><a href="{% url 'export_pengaduan_pdf' %}">Download Laporan PDF</a></li>
     <li><a href="{% url 'export_pengaduan_excel' %}">Download Laporan Excel</a></li>
 </ul>
 
+<h3>📊 Statistik Pengaduan</h3>
+<canvas id="grafikPengaduan" width="400" height="150"></canvas>
 
-<h3>Daftar Pengaduan</h3>
+<h3>📌 Daftar Pengaduan</h3>
 <table border="1">
     <tr>
         <th>No</th>
         <th>NIK</th>
+        <th>Nama Pelapor</th>
+        <th>Kategori</th>
         <th>Isi Laporan</th>
+        <th>Lokasi</th>
+        <th>Tanggal</th>
+        <th>Foto Bukti</th>
         <th>Status</th>
         <th>Aksi</th>
     </tr>
@@ -44,15 +62,52 @@
     <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ pengaduan.nik.nik }}</td>
+        <td>{{ pengaduan.nik.nama }}</td>
+        <td>{{ pengaduan.get_kategori_display }}</td>
         <td>{{ pengaduan.isi_laporan }}</td>
-        <td>{{ pengaduan.status }}</td>
+        <td>{{ pengaduan.lokasi }}</td>
+        <td>{{ pengaduan.tgl_pengaduan }}</td>
+        <td>
+            {% if pengaduan.foto %}
+                <img src="{{ pengaduan.foto.url }}" alt="Bukti" width="100">
+            {% else %}
+                Tidak ada foto
+            {% endif %}
+        </td>
+        <td>
+            {% if pengaduan.status == "tunggu" %}
+                <span style="color: orange;">Belum Diproses</span>
+            {% elif pengaduan.status == "proses" %}
+                <span style="color: blue;">Sedang Diproses</span>
+            {% elif pengaduan.status == "selesai" %}
+                <span style="color: green;">Selesai</span>
+            {% else %}
+                <span style="color: red;">Tidak Diketahui</span>
+            {% endif %}
+        </td>
         <td>
             <a href="{% url 'detail_pengaduan' pengaduan.id_pengaduan %}">Lihat</a> |
-            <a href="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}">Ubah Status</a>
+            <a href="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}">Ubah Status</a> |
+            <a href="{% url 'beri_tanggapan' pengaduan.id_pengaduan %}">Beri Tanggapan</a>
         </td>
     </tr>
     {% endfor %}
 </table>
+
+<script>
+    var ctx = document.getElementById('grafikPengaduan').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Belum Diproses", "Sedang Diproses", "Selesai"],
+            datasets: [{
+                label: 'Jumlah Pengaduan',
+                data: [{{ jumlah_tunggu }}, {{ jumlah_proses }}, {{ jumlah_selesai }}],
+                backgroundColor: ['orange', 'blue', 'green']
+            }]
+        }
+    });
+</script>
 
 </body>
 </html>

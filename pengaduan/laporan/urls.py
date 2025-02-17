@@ -4,6 +4,7 @@ from .views import (
     dashboard_admin, dashboard_petugas, dashboard_masyarakat,
     buat_pengaduan, daftar_pengaduan, detail_pengaduan, ubah_status_pengaduan,
     buat_petugas, beri_tanggapan, export_pengaduan_excel, export_pengaduan_pdf,
+    kelola_akun, ubah_status_akun
 )
 
 urlpatterns = [
@@ -30,5 +31,8 @@ urlpatterns = [
 
     path('laporan/pdf/', export_pengaduan_pdf, name='export_pengaduan_pdf'),
     path('laporan/excel/', export_pengaduan_excel, name='export_pengaduan_excel'),
+
+    path('kelola_akun/', kelola_akun, name='kelola_akun'),
+    path('ubah_status_akun/<str:role>/<str:user_id>/', ubah_status_akun, name='ubah_status_akun'),
 
 ]

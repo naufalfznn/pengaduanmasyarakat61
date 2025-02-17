@@ -6,6 +6,7 @@ class Masyarakat(models.Model):
     username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=32)
     telp = models.CharField(max_length=13)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         managed = False 
@@ -34,7 +35,8 @@ class Petugas(models.Model):
     username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=64) 
     telp = models.CharField(max_length=13)
-    role = models.CharField(max_length=50, default='petugas')  
+    role = models.CharField(max_length=50, default='petugas')
+    is_active = models.BooleanField(default=True)  
 
     class Meta:
         db_table = 'petugas'

@@ -12,6 +12,10 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
+import matplotlib.pyplot as plt
+import base64
+from django.db.models import Count
+
 
 def homepage(request):
     role = "public"  # Default untuk yang belum login
@@ -297,3 +301,55 @@ def export_pengaduan_excel(request):
     response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.xlsx"'
     df.to_excel(response, index=False)
     return response
+
+def kelola_akun(request):
+    if 'user_role' not in request.session or request.session['user_role'] != 'admin':
+        messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+        return redirect('login')
+
+    masyarakat_list = Masyarakat.objects.all()
+    petugas_list = Petugas.objects.all()
+    jumlah_masyarakat = Masyarakat.objects.count()
+    jumlah_petugas = Petugas.objects.count()
+
+    # 📊 Grafik Status Pengaduan
+    status_counts = Pengaduan.objects.values('status').annotate(count=Count('status'))
+    labels = [s['status'] for s in status_counts]
+    values = [s['count'] for s in status_counts]
+
+    fig, ax = plt.subplots()
+    ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+
+    return render(request, 'admin/kelola_akun.html', {
+        'masyarakat_list': masyarakat_list,
+        'petugas_list': petugas_list,
+        'jumlah_masyarakat': jumlah_masyarakat,
+        'jumlah_petugas': jumlah_petugas,
+        'grafik_pengaduan': image_base64
+    })
+
+def ubah_status_akun(request, role, user_id):
+    if 'user_role' not in request.session or request.session['user_role'] != 'admin':
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('login')
+
+    if role == "masyarakat":
+        user = get_object_or_404(Masyarakat, nik=user_id)
+    elif role == "petugas":
+        user = get_object_or_404(Petugas, id_petugas=user_id)
+    else:
+        messages.error(request, "Role tidak valid.")
+        return redirect('kelola_akun')
+
+    user.is_active = not user.is_active
+    user.save()
+    messages.success(request, f"Akun {role} {user.username} telah {'diaktifkan' if user.is_active else 'dinonaktifkan'}.")
+
+    return redirect('kelola_akun')
