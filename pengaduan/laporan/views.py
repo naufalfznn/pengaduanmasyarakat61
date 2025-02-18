@@ -12,6 +12,8 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
+from .models import Masyarakat
+from django.contrib.auth.models import User
 
 def homepage(request):
     role = "public"  # Default untuk yang belum login
@@ -44,6 +46,7 @@ def register(request):
         form = RegisterForm()
     return render(request, 'auth/register.html', {'form': form})
 
+
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -51,44 +54,56 @@ def login_view(request):
             username = form.cleaned_data['username']
             password = hashlib.sha256(form.cleaned_data['password'].encode()).hexdigest()
 
-            # Cek di tabel administrator
+            # Cek di tabel Administrator
             admin = Administrator.objects.filter(username=username, password=password).first()
             if admin:
+                user, _ = User.objects.get_or_create(username=username)  # Hindari duplikasi User
+                login(request, user)
                 request.session['user_id'] = admin.id_admin
-                request.session['username'] = admin.username
                 request.session['user_role'] = 'admin'
+                request.session['username'] = admin.username
+                request.session['nama_admin'] = admin.nama_admin # Sesuaikan dengan kolom yang ada
                 messages.success(request, "Login berhasil sebagai Administrator.")
                 return redirect('dashboard_admin')
 
-            # Cek di tabel petugas
+            # Cek di tabel Petugas
             petugas = Petugas.objects.filter(username=username, password=password).first()
             if petugas:
+                user, _ = User.objects.get_or_create(username=username)
+                login(request, user)
                 request.session['user_id'] = petugas.id_petugas
-                request.session['username'] = petugas.username
                 request.session['user_role'] = 'petugas'
+                request.session['username'] = petugas.username
+                request.session['nama_petugas'] = petugas.nama_petugas
                 messages.success(request, "Login berhasil sebagai Petugas.")
                 return redirect('dashboard_petugas')
 
-            # Cek di tabel masyarakat
+            # Cek di tabel Masyarakat
             masyarakat = Masyarakat.objects.filter(username=username, password=password).first()
             if masyarakat:
+                user, _ = User.objects.get_or_create(username=username)
+                login(request, user)
                 request.session['user_id'] = masyarakat.nik
-                request.session['username'] = masyarakat.username
                 request.session['user_role'] = 'masyarakat'
+                request.session['username'] = masyarakat.username
+                request.session['nama'] = masyarakat.nama
+                request.session['nama'] = masyarakat.nama if masyarakat.nama else "Tidak Ada Nama"
+                request.session['telp'] = masyarakat.telp if masyarakat.telp else "Tidak Ada Telepon"
                 messages.success(request, "Login berhasil sebagai Masyarakat.")
                 return redirect('dashboard_masyarakat')
 
             messages.error(request, "Username atau password salah!")
-    
+
     else:
         form = LoginForm()
-    
+
     return render(request, 'auth/login.html', {'form': form})
 
+
 def logout_view(request):
-    logout(request)
+    request.session.flush()  # Hapus semua data session
     messages.success(request, "Anda telah logout.")
-    return redirect('homepage')
+    return redirect("homepage")
 
 def dashboard_admin(request):
     if request.session.get('user_role') == 'admin':
@@ -122,10 +137,6 @@ def dashboard_masyarakat(request):
             'pengaduan_list': pengaduan_list,
             'role': role  # Kirim ke template
         })
-    messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
-    return redirect('login')
-
-
     messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
     return redirect('login')
 
@@ -168,8 +179,6 @@ def ubah_status_pengaduan(request, id_pengaduan):
             messages.success(request, "Status pengaduan berhasil diperbarui.")
         else:
             messages.error(request, "Status tidak valid.")  # ❌ Jika ada error input
-
-    return redirect('detail_pengaduan', id_pengaduan=id_pengaduan)
 
     return redirect('detail_pengaduan', id_pengaduan=id_pengaduan)
 
@@ -297,3 +306,27 @@ def export_pengaduan_excel(request):
     response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.xlsx"'
     df.to_excel(response, index=False)
     return response
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def profil_masyarakat(request):
+    if "user_id" not in request.session:
+        return redirect("login")  # Redirect ke login jika belum login
+
+    try:
+       masyarakat = Masyarakat.objects.get(nik=request.session.get("user_id"))
+    except Masyarakat.DoesNotExist:
+        return redirect("login")  # Jika data tidak ditemukan, kembali ke login
+    
+    context = {
+        "nik": request.session.get("user_id"),
+        "username": request.session.get("username"),
+        "nama": request.session.get("nama"),
+        "telp": request.session.get("telp"),
+        "role": request.session.get("role"),
+        "image": masyarakat.image.url if masyarakat.image else None,
+    }
+    
+    return render(request, "akun/profil_masyarakat.html", context)

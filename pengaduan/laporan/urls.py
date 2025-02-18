@@ -4,8 +4,8 @@ from .views import (
     dashboard_admin, dashboard_petugas, dashboard_masyarakat,
     buat_pengaduan, daftar_pengaduan, detail_pengaduan, ubah_status_pengaduan,
     buat_petugas, beri_tanggapan, export_pengaduan_excel, export_pengaduan_pdf,
-)
-
+    profil_masyarakat,
+)   
 urlpatterns = [
     path('', homepage, name='homepage'),
     path('register/', register, name='register'),
@@ -30,5 +30,6 @@ urlpatterns = [
 
     path('laporan/pdf/', export_pengaduan_pdf, name='export_pengaduan_pdf'),
     path('laporan/excel/', export_pengaduan_excel, name='export_pengaduan_excel'),
-
+    
+    path('profil/', profil_masyarakat, name='profil_masyarakat'),
 ]

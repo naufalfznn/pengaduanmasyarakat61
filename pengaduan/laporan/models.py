@@ -6,6 +6,7 @@ class Masyarakat(models.Model):
     username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=32)
     telp = models.CharField(max_length=13)
+    image = models.ImageField(upload_to='masyarakat_foto/', blank=True, null=True)
 
     class Meta:
         managed = False 
@@ -14,12 +15,14 @@ class Masyarakat(models.Model):
     def __str__(self):
         return self.nama
 
+
 class Administrator(models.Model):
     id_admin = models.AutoField(primary_key=True)
     nama_admin = models.CharField(max_length=35)
     username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=32)
     telp = models.CharField(max_length=13)
+    image = models.ImageField(upload_to='administrator_foto/', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -32,15 +35,17 @@ class Petugas(models.Model):
     id_petugas = models.AutoField(primary_key=True)
     nama_petugas = models.CharField(max_length=100)
     username = models.CharField(max_length=25, unique=True)
-    password = models.CharField(max_length=64) 
+    password = models.CharField(max_length=64)
     telp = models.CharField(max_length=13)
-    role = models.CharField(max_length=50, default='petugas')  
+    role = models.CharField(max_length=50, default='petugas')
+    image = models.ImageField(upload_to='petugas_foto/', blank=True, null=True)
 
     class Meta:
         db_table = 'petugas'
 
     def __str__(self):
         return self.nama_petugas
+
 
 class Pengaduan(models.Model):
     STATUS_CHOICES = [

@@ -37,16 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'laporan', 
+    'laporan',
 ]
 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # ⬅️ WAJIB
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # ⬅️ WAJIB
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -56,7 +56,9 @@ ROOT_URLCONF = 'pengaduan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Pastikan ini mengarah ke folder templates
+        'DIRS': [BASE_DIR / 'templates',
+                 'pengaduan/laporan/templates',
+                 ],  # Tambahkan path ke templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +70,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 
 
@@ -136,4 +139,10 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_URL = '/login/'
+
+LOGIN_URL = '/login/'  # Sesuaikan dengan URL halaman login kamu
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Simpan session di database
+SESSION_COOKIE_AGE = 1209600  # Session berlaku 2 minggu
+SESSION_SAVE_EVERY_REQUEST = True  # Simpan setiap request
+
