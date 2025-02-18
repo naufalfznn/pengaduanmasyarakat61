@@ -65,7 +65,7 @@
         <td>{{ pengaduan.get_kategori_display }}</td>
         <td>{{ pengaduan.isi_laporan }}</td>
         <td>{{ pengaduan.lokasi }}</td>
-        <td>{{ pengaduan.tgl_pengaduan }}</td>
+        <td>{{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</td>
         <td>
             {% if pengaduan.foto %}
                 <img src="{{ pengaduan.foto.url }}" alt="Bukti" width="100">

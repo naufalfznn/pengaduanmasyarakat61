@@ -1,5 +1,5 @@
 <h2>Detail Pengaduan</h2>
-<p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan }}</p>
+<p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</p>
 <p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
 <p><strong>Status:</strong> {{ pengaduan.status }}</p>
 <p><strong>Foto Bukti:</strong></p>
@@ -26,7 +26,7 @@
 <h3>Tanggapan</h3>
 {% if pengaduan.tanggapan_set.all %}
     {% for tanggapan in pengaduan.tanggapan_set.all %}
-        <p><strong>{{ tanggapan.tgl_tanggapan }}:</strong> {{ tanggapan.tanggapan }}</p>
+        <p><strong>{{ tanggapan.tgl_tanggapan|date:"Y-m-d H:i:s" }}:</strong> {{ tanggapan.tanggapan }}</p>
         {% if tanggapan.id_petugas %}
             <p><em>Ditanggapi oleh Petugas: {{ tanggapan.id_petugas.nama_petugas }}</em></p>
         {% elif tanggapan.id_admin %}

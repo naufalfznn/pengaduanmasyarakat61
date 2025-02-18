@@ -6,7 +6,7 @@
 </head>
 <body>
     <h2>Beri Tanggapan untuk Pengaduan</h2>
-    <p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan }}</p>
+    <p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</p>
     <p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
     <p><strong>Status:</strong> {{ pengaduan.status }}</p>
 

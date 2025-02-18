@@ -251,8 +251,6 @@ def buat_petugas(request):
 
     return render(request, 'admin/buat_petugas.html', {'form': form})
 
-
-
 def beri_tanggapan(request, id_pengaduan):
     if 'user_role' not in request.session or request.session['user_role'] not in ['admin', 'petugas']:
         messages.error(request, "Anda harus login sebagai Admin atau Petugas untuk memberikan tanggapan.")
@@ -282,9 +280,9 @@ def beri_tanggapan(request, id_pengaduan):
         if form.is_valid():
             tanggapan = form.save(commit=False)
             tanggapan.id_pengaduan = pengaduan
-            tanggapan.tgl_tanggapan = datetime.date.today()
-            tanggapan.id_petugas = petugas 
-            tanggapan.id_admin = admin  
+            tanggapan.tgl_tanggapan = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Pastikan format 24 jam tanpa AM/PM
+            tanggapan.id_petugas = petugas if petugas else None  
+            tanggapan.id_admin = admin if admin else None  
             tanggapan.save()
             messages.success(request, "Tanggapan berhasil dikirim!")
             return redirect('detail_pengaduan', id_pengaduan=id_pengaduan)

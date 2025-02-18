@@ -78,10 +78,6 @@ class TanggapanForm(forms.ModelForm):
             'tanggapan': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Masukkan tanggapan'}),
         }
 
-
-from django import forms
-from .models import Masyarakat, Petugas
-
 class ProfilMasyarakatForm(forms.ModelForm):
     class Meta:
         model = Masyarakat
