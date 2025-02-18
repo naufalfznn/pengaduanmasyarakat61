@@ -3,8 +3,8 @@ from .views import (
     homepage, register, login_view, logout_view,
     dashboard_admin, dashboard_petugas, dashboard_masyarakat,
     buat_pengaduan, daftar_pengaduan, detail_pengaduan, ubah_status_pengaduan,
-    buat_petugas, beri_tanggapan, export_pengaduan_excel, export_pengaduan_pdf,
-    kelola_akun, ubah_status_akun
+    buat_petugas, beri_tanggapan, export_pengaduan_pdf,
+    kelola_akun, ubah_status_akun, profil_masyarakat, profil_petugas
 )
 
 urlpatterns = [
@@ -30,9 +30,11 @@ urlpatterns = [
     path('pengaduan/<int:id_pengaduan>/tanggapan/', beri_tanggapan, name='beri_tanggapan'),
 
     path('laporan/pdf/', export_pengaduan_pdf, name='export_pengaduan_pdf'),
-    path('laporan/excel/', export_pengaduan_excel, name='export_pengaduan_excel'),
 
     path('kelola_akun/', kelola_akun, name='kelola_akun'),
     path('ubah_status_akun/<str:role>/<str:user_id>/', ubah_status_akun, name='ubah_status_akun'),
+
+    path('profil/masyarakat/', profil_masyarakat, name='profil_masyarakat'),
+    path('profil/petugas/', profil_petugas, name='profil_petugas'),
 
 ]

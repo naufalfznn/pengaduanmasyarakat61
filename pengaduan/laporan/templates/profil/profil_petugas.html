@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Petugas</title>
+</head>
+<body>
+
+<h2>Profil</h2>
+{% if petugas.foto_profil %}
+    <img src="{{ petugas.foto_profil.url }}" alt="Foto Profil" width="150">
+{% else %}
+    <p>Foto profil belum diunggah.</p>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Simpan Perubahan</button>
+</form>
+
+<a href="{% url 'dashboard_petugas' %}">Kembali ke Dashboard</a>
+
+</body>
+</html>

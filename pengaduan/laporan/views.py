@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from .models import Administrator, Petugas, Masyarakat, Pengaduan, Tanggapan
-from .forms import RegisterForm, LoginForm, PengaduanForm, PetugasForm, TanggapanForm
+from .forms import RegisterForm, LoginForm, PengaduanForm, PetugasForm, TanggapanForm, ProfilMasyarakatForm, ProfilPetugasForm
 from django.contrib import messages
 import hashlib
 import datetime
@@ -20,7 +20,9 @@ matplotlib.use('Agg')
 from collections import Counter
 from django.db.models.functions import TruncDate
 from django.utils import timezone
-
+from reportlab.lib import colors
+from datetime import datetime
+from reportlab.platypus import Table, TableStyle
 
 
 def homepage(request):
@@ -73,6 +75,9 @@ def login_view(request):
             # Cek di tabel petugas
             petugas = Petugas.objects.filter(username=username, password=password).first()
             if petugas:
+                if not petugas.is_active:
+                    messages.error(request, "Akun Anda telah dinonaktifkan.")
+                    return redirect('login')
                 request.session['user_id'] = petugas.id_petugas
                 request.session['username'] = petugas.username
                 request.session['user_role'] = 'petugas'
@@ -82,6 +87,9 @@ def login_view(request):
             # Cek di tabel masyarakat
             masyarakat = Masyarakat.objects.filter(username=username, password=password).first()
             if masyarakat:
+                if not masyarakat.is_active:
+                    messages.error(request, "Akun Anda telah dinonaktifkan.")
+                    return redirect('login')
                 request.session['user_id'] = masyarakat.nik
                 request.session['username'] = masyarakat.username
                 request.session['user_role'] = 'masyarakat'
@@ -89,10 +97,10 @@ def login_view(request):
                 return redirect('dashboard_masyarakat')
 
             messages.error(request, "Username atau password salah!")
-    
+
     else:
         form = LoginForm()
-    
+
     return render(request, 'auth/login.html', {'form': form})
 
 def logout_view(request):
@@ -293,32 +301,72 @@ def export_pengaduan_pdf(request):
 
     pengaduan_list = Pengaduan.objects.all()
 
-    buffer = BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=letter)
-    pdf.drawString(100, 750, "Laporan Pengaduan Masyarakat")
-    y = 730
+    data = [['Tanggal Pengaduan', 'Kategori', 'Nama Pelapor', 'Status', 'Isi Laporan']]
 
     for pengaduan in pengaduan_list:
-        pdf.drawString(100, y, f"{pengaduan.tgl_pengaduan} - {pengaduan.kategori} - {pengaduan.status}")
-        y -= 20
+        data.append([
+            pengaduan.tgl_pengaduan.strftime('%d-%m-%Y %H:%M:%S'),
+            pengaduan.kategori,
+            pengaduan.nik.nama,
+            pengaduan.status,
+            pengaduan.isi_laporan[:100] + '...' if len(pengaduan.isi_laporan) > 100 else pengaduan.isi_laporan
+        ])
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(200, height - 50, "Laporan Pengaduan Masyarakat")
+
+    pdf.setStrokeColor(colors.black)
+    pdf.setLineWidth(1)
+    pdf.line(50, height - 60, width - 50, height - 60)
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(50, height - 75, f"Tanggal Laporan: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}")
+
+    table = Table(data, colWidths=[100, 100, 120, 80, 130])
+
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('ALIGN', (4, 1), (4, -1), 'LEFT')
+    ]))
+
+    margin_left = 50
+    margin_top = height - 200
+    table.wrapOn(pdf, width - 2 * margin_left, height - 250)
+
+    # Memeriksa apakah tabel melebihi batas halaman dan memulai halaman baru
+    while table._height > height - margin_top - 50:
+        table.drawOn(pdf, margin_left, margin_top)
+        pdf.showPage()
+        table.wrapOn(pdf, width - 2 * margin_left, height - 250)
+        margin_top = height - 50
+
+    # Menampilkan tabel di halaman pertama
+    table.drawOn(pdf, margin_left, margin_top)
+
+    pdf.setFont("Helvetica", 8)
+    page_number = pdf.getPageNumber()
+    pdf.drawString(width - 70, 30, f"Halaman {page_number}")
+
+    pdf.setFont("Helvetica", 6)
+    pdf.drawString(50, 30, "Pengaduan Masyarakat - www.pengaduanmasyarakat.com")
 
     pdf.save()
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.pdf"'
-    return response
-
-def export_pengaduan_excel(request):
-    if 'user_role' not in request.session or request.session['user_role'] != 'admin':
-        messages.error(request, "Anda tidak memiliki akses.")
-        return redirect('login')
-
-    pengaduan_list = Pengaduan.objects.all().values('tgl_pengaduan', 'nik__nama', 'kategori', 'status')
-
-    df = pd.DataFrame(list(pengaduan_list))
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="laporan_pengaduan.xlsx"'
-    df.to_excel(response, index=False)
     return response
 
 def kelola_akun(request):
@@ -331,30 +379,29 @@ def kelola_akun(request):
     jumlah_masyarakat = Masyarakat.objects.count()
     jumlah_petugas = Petugas.objects.count()
 
-    # 📊 Grafik Pengaduan per Hari
-    # TruncDate digunakan untuk mengelompokkan pengaduan berdasarkan tanggal
-    pengaduan_per_hari = Pengaduan.objects.annotate(date=TruncDate('tanggal_pengaduan')) \
+    # ✅ Gunakan `tgl_pengaduan`, bukan `tanggal_pengaduan`
+    pengaduan_per_hari = Pengaduan.objects.annotate(date=TruncDate('tgl_pengaduan')) \
                                           .values('date') \
-                                          .annotate(count=Count('date')) \
+                                          .annotate(count=Count('id_pengaduan')) \
                                           .order_by('date')
 
     # Menyusun data untuk grafik
-    dates = [item['date'] for item in pengaduan_per_hari]
+    dates = [str(item['date']) for item in pengaduan_per_hari]  # Convert ke string untuk matplotlib
     counts = [item['count'] for item in pengaduan_per_hari]
 
     # Membuat grafik garis
-    fig, ax = plt.subplots()
-    ax.plot(dates, counts, marker='o', color='b', label='Pengaduan per Hari')
-    ax.set_xlabel('Tanggal')
-    ax.set_ylabel('Jumlah Pengaduan')
-    ax.set_title('Grafik Pengaduan per Hari')
-    ax.grid(True)
-    ax.legend()
+    plt.figure(figsize=(8, 4))
+    plt.plot(dates, counts, marker='o', color='b', label='Pengaduan per Hari')
+    plt.xlabel('Tanggal')
+    plt.ylabel('Jumlah Pengaduan')
+    plt.title('Grafik Pengaduan per Hari')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.grid()
 
-    # Menyimpan grafik ke dalam buffer sebagai PNG
+    # Simpan grafik ke buffer
     buffer = BytesIO()
-    plt.xticks(rotation=45)  # Agar tanggal tidak saling bertumpuk
-    plt.savefig(buffer, format='png')
+    plt.savefig(buffer, format='png', bbox_inches="tight")
     buffer.seek(0)
     image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
     buffer.close()
@@ -385,3 +432,40 @@ def ubah_status_akun(request, role, user_id):
     messages.success(request, f"Akun {role} {user.username} telah {'diaktifkan' if user.is_active else 'dinonaktifkan'}.")
 
     return redirect('kelola_akun')
+
+def profil_masyarakat(request):
+    if 'user_role' not in request.session or request.session['user_role'] != 'masyarakat':
+        messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+        return redirect('login')
+
+    masyarakat = get_object_or_404(Masyarakat, nik=request.session['user_id'])
+
+    if request.method == 'POST':
+        form = ProfilMasyarakatForm(request.POST, request.FILES, instance=masyarakat)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profil berhasil diperbarui!")
+            return redirect('profil_masyarakat')
+    else:
+        form = ProfilMasyarakatForm(instance=masyarakat)
+
+    return render(request, 'profil/profil_masyarakat.html', {'form': form, 'masyarakat': masyarakat})
+
+
+def profil_petugas(request):
+    if 'user_role' not in request.session or request.session['user_role'] != 'petugas':
+        messages.error(request, "Anda tidak memiliki akses ke halaman ini.")
+        return redirect('login')
+
+    petugas = get_object_or_404(Petugas, id_petugas=request.session['user_id'])
+
+    if request.method == 'POST':
+        form = ProfilPetugasForm(request.POST, request.FILES, instance=petugas)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profil berhasil diperbarui!")
+            return redirect('profil_petugas')
+    else:
+        form = ProfilPetugasForm(instance=petugas)
+
+    return render(request, 'profil/profil_petugas.html', {'form': form, 'petugas': petugas})

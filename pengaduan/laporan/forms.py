@@ -2,7 +2,7 @@ from django import forms
 from .models import Masyarakat, Pengaduan, Petugas, Tanggapan
 import hashlib
 
-# ✅ Form Registrasi Masyarakat
+# Form Registrasi Masyarakat
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
@@ -17,12 +17,12 @@ class RegisterForm(forms.ModelForm):
             masyarakat.save()
         return masyarakat
 
-# ✅ Form Login
+# Form Login
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=25, label="Username")
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
-# ✅ Form Pengaduan
+# Form Pengaduan
 class PengaduanForm(forms.ModelForm):
     kategori_lainnya = forms.CharField(
         required=False,
@@ -54,7 +54,7 @@ class PengaduanForm(forms.ModelForm):
 
         return cleaned_data
     
-# ✅ Form Pembuatan Petugas (Admin bisa buat petugas)
+# Form Pembuatan Petugas (Admin bisa buat petugas)
 class PetugasForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
@@ -69,11 +69,35 @@ class PetugasForm(forms.ModelForm):
             petugas.save()
         return petugas
 
-# ✅ Form untuk Memberikan Tanggapan
+# Form untuk Memberikan Tanggapan
 class TanggapanForm(forms.ModelForm):
     class Meta:
         model = Tanggapan
         fields = ['tanggapan']
         widgets = {
             'tanggapan': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Masukkan tanggapan'}),
+        }
+
+
+from django import forms
+from .models import Masyarakat, Petugas
+
+class ProfilMasyarakatForm(forms.ModelForm):
+    class Meta:
+        model = Masyarakat
+        fields = ['nama', 'username', 'telp', 'foto_profil']
+        widgets = {
+            'nama': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'telp': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class ProfilPetugasForm(forms.ModelForm):
+    class Meta:
+        model = Petugas
+        fields = ['nama_petugas', 'username', 'telp', 'foto_profil']
+        widgets = {
+            'nama_petugas': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'telp': forms.TextInput(attrs={'class': 'form-control'}),
         }

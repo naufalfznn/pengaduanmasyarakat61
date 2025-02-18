@@ -23,28 +23,27 @@
    <a href="{% url 'logout' %}">Logout</a>
 </p>
 
-<h3>📌 Statistik Pengguna</h3>
+<h3>Statistik Pengguna</h3>
 <ul>
     <li>Total Masyarakat: <strong>{{ total_masyarakat }}</strong></li>
     <li>Total Petugas: <strong>{{ total_petugas }}</strong></li>
 </ul>
 
-<h3>📌 Kelola Akun</h3>
+<h3>Kelola Akun</h3>
 <ul>
     <li><a href="{% url 'buat_petugas' %}">Tambah Petugas</a></li>
     <li><a href="{% url 'kelola_akun' %}">Kelola Akun Pengguna</a></li>
 </ul>
 
-<h3>📌 Generate Laporan</h3>
+<h3>Generate Laporan</h3>
 <ul>
-    <li><a href="{% url 'export_pengaduan_pdf' %}">Download Laporan PDF</a></li>
-    <li><a href="{% url 'export_pengaduan_excel' %}">Download Laporan Excel</a></li>
+    <li><a href="{% url 'export_pengaduan_pdf' %}">Download Laporan</a></li>
 </ul>
 
-<h3>📊 Statistik Pengaduan</h3>
+<h3>Statistik Pengaduan</h3>
 <canvas id="grafikPengaduan" width="400" height="150"></canvas>
 
-<h3>📌 Daftar Pengaduan</h3>
+<h3>Daftar Pengaduan</h3>
 <table border="1">
     <tr>
         <th>No</th>
