@@ -1,12 +1,55 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengaduan Masyarakat</title>
-</head>
-<body>
+    <title>Selamat Datang - Pengaduan Masyarakat</title>
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.46);
+            transition: background 0.3s ease-in-out;
+        }
+        .hero {
+            height: 100vh;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s ease-in-out;
+        }
+        .hero-content {
+            width: 100%;
+        }
+        .left {
+            text-align: left;
+        }
+        .right {
+            text-align: right;
+        }
+        .hero-1 {
+            background: url('{% static "images/hal1.png" %}') no-repeat center center/cover;
+        }
+        .hero-2 {
+            background: url('{% static "images/hal2.png" %}') no-repeat center center/cover;
+        }
+        .hero-3 {
+            background: url('{% static "images/hal3.png" %}') no-repeat center center/cover;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar Dinamis -->
     {% if user.is_authenticated %}
         {% if user.role == "masyarakat" %}
             {% include 'includes/navbar_masyarakat.html' %}
@@ -19,8 +62,67 @@
         {% include 'includes/navbar_public.html' %}
     {% endif %}
 
-    <h1>Selamat Datang di Sistem Pengaduan Masyarakat</h1>
-    <p>Silakan masuk atau daftar untuk mengakses layanan.</p>
+    <section class="hero hero-1" id="heroSection">
+        <div class="container">
+            <div class="hero-content right" id="heroContent">
+                <h2 class="display-3 fw-bold mb-3">Halo, Selamat Datang!</h2>
+                <p class="lead">Layanan ini membantu Anda dalam melaporkan permasalahan di sekitar Anda.</p>
+                <div class="gap-4 mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-lg btn-primary">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-lg btn-outline-dark">Daftar</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <script>
+        const heroSection = document.getElementById("heroSection");
+        const heroContent = document.getElementById("heroContent");
+        const heroData = [
+            {
+                class: "hero-1",
+                position: "right",
+                title: "Halo, Selamat Datang!",
+                text: "Layanan ini membantu Anda dalam melaporkan permasalahan di sekitar Anda.",
+                button1: { text: "Login", link: "{% url 'login' %}" },
+                button2: { text: "Daftar", link: "{% url 'register' %}" }
+            },
+            {
+                class: "hero-2",
+                position: "left",
+                title: "Laporkan Permasalahan Anda",
+                text: "Kami siap membantu menyelesaikan masalah Anda dengan cepat dan transparan.",
+                button1: { text: "Login", link: "{% url 'login' %}" },
+                button2: { text: "Daftar", link: "{% url 'register' %}" }
+            },
+            {
+                class: "hero-3",
+                position: "right",
+                title: "Bersama, Membangun Masyarakat",
+                text: "Mari berpartisipasi dalam menciptakan lingkungan yang lebih baik bagi kita semua.",
+                button1: { text: "Login", link: "{% url 'login' %}" },
+                button2: { text: "Daftar", link: "{% url 'register' %}" }
+            }
+        ];
+        let index = 0;
+
+        function changeHero() {
+            heroSection.classList.remove(heroData[index].class);
+            heroContent.classList.remove(heroData[index].position);
+            index = (index + 1) % heroData.length;
+            heroSection.classList.add(heroData[index].class);
+            heroContent.classList.add(heroData[index].position);
+            heroContent.innerHTML = `
+                <h2 class="display-3 fw-bold mb-3">${heroData[index].title}</h2>
+                <p class="lead">${heroData[index].text}</p>
+                <div class=" gap-4 mt-4">
+                    <a href="${heroData[index].button1.link}" class="btn btn-lg btn-primary">${heroData[index].button1.text}</a>
+                    <a href="${heroData[index].button2.link}" class="btn btn-lg btn-outline-dark">${heroData[index].button2.text}</a>
+                </div>
+            `;
+        }
+
+        setInterval(changeHero, 5000);
+    </script>
 </body>
 </html>
