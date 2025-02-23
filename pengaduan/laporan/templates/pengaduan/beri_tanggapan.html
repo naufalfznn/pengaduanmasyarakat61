@@ -3,25 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Berikan Tanggapan</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/beritanggapan.css' %}">
 </head>
 <body>
-    <h2>Beri Tanggapan untuk Pengaduan</h2>
-    <p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</p>
-    <p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
-    <p><strong>Status:</strong> {{ pengaduan.status }}</p>
+    <div class="container">
+        <h2>Beri Tanggapan untuk Pengaduan</h2>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Kirim Tanggapan</button>
-    </form>
+        <div class="pengaduan-detail">
+            <p><strong>Tanggal:</strong> {{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</p>
+            <p><strong>Isi Laporan:</strong> {{ pengaduan.isi_laporan }}</p>
+            <p><strong>Status:</strong> {{ pengaduan.status }}</p>
+        </div>
 
-    {% if user.is_staff %}
-        <a href="{% url 'dashboard_admin' %}">Kembali ke Dashboard Admin</a>
-    {% elif user.role == 'petugas' %}
-        <a href="{% url 'dashboard_petugas' %}">Kembali ke Dashboard Petugas</a>
-    {% else %}
-        <a href="{% url 'homepage' %}">Kembali ke Beranda</a>
-    {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Kirim Tanggapan</button>
+        </form>
+
+        <div class="back-btn-container">
+            {% if request.session.user_role == "admin" %}
+                <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">Kembali ke Dashboard</a>
+            {% elif request.session.user_role == "petugas" %}
+                <a href="{% url 'dashboard_petugas' %}" class="btn btn-secondary">Kembali ke Dashboard</a>
+            {% else %}
+                <a href="{% url 'dashboard_masyarakat' %}" class="btn btn-secondary">Kembali ke Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>

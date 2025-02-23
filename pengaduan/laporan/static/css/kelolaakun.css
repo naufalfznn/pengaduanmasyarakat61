@@ -1,0 +1,90 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #DDF2FD;
+    color: #164863;
+    text-align: center;
+    padding: 20px;
+}
+
+h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    width: 90%;
+    max-width: 800px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #9BBEC8;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #427D9D;
+    color: white;
+}
+
+td {
+    background-color: white;
+}
+
+a {
+    display: inline-block;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+a[href*="ubah_status_akun"] {
+    background-color: #164863;
+    color: white;
+}
+
+a[href*="ubah_status_akun"]:hover {
+    background-color: #427D9D;
+}
+
+a[href*="dashboard_admin"] {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #164863;
+}
+
+a[href*="dashboard_admin"]:hover {
+    color: #427D9D;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 10px;
+}

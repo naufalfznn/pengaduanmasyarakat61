@@ -4,128 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Library Chart.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    {% if request.session.user_role == 'admin' %}
-        {% include 'includes/navbar_admin.html' %}
-    {% elif request.session.user_role == 'petugas' %}
-        {% include 'includes/navbar_petugas.html' %}
-    {% elif request.session.user_role == 'masyarakat' %}
-        {% include 'includes/navbar_masyarakat.html' %}
-    {% else %}
-        {% include 'includes/navbar_public.html' %}
-    {% endif %}
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2 class="text-center">Admin Panel</h2>
+    <ul>
+        <li><a href="{% url 'dashboard_admin' %}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="{% url 'buat_petugas' %}"><i class="fas fa-user-shield"></i> <span>Kelola Petugas</span></a></li>
+        <li><a href="{% url 'kelola_akun' %}"><i class="fas fa-users"></i> <span>Kelola Akun</span></a></li>
+        <li><a href="{% url 'export_pengaduan_pdf' %}"><i class="fas fa-file-download"></i> <span>Download Laporan</span></a></li>
+        <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+    </ul>
+</div>
 
-<h2>Dashboard Administrator</h2>
-<p>Selamat datang, <strong>{{ request.session.username }}</strong>!  
-   <a href="{% url 'logout' %}">Logout</a>
-</p>
 
-<h3>Statistik Pengguna</h3>
-<ul>
-    <li>Total Masyarakat: <strong>{{ total_masyarakat }}</strong></li>
-    <li>Total Petugas: <strong>{{ total_petugas }}</strong></li>
-</ul>
+<!-- Konten Utama -->
+<div class="main-content">
+    <h2>Dashboard Administrator</h2>
+    <p>Selamat datang, <strong>{{ request.session.username }}</strong>!</p>
 
-<h3>Kelola Akun</h3>
-<ul>
-    <li><a href="{% url 'buat_petugas' %}">Tambah Petugas</a></li>
-    <li><a href="{% url 'kelola_akun' %}">Kelola Akun Pengguna</a></li>
-</ul>
+    <h3>Statistik Pengguna</h3>
+    <ul>
+        <li>Total Masyarakat: <strong>{{ total_masyarakat }}</strong></li>
+        <li>Total Petugas: <strong>{{ total_petugas }}</strong></li>
+    </ul>
 
-<h3>Generate Laporan</h3>
-<ul>
-    <li><a href="{% url 'export_pengaduan_pdf' %}">Download Laporan</a></li>
-</ul>
+    <h3>Statistik Pengaduan</h3>
+    <canvas id="grafikPengaduan"></canvas>
 
-<h3>Statistik Pengaduan</h3>
-<canvas id="grafikPengaduan" width="400" height="150"></canvas>
-
-<h3>Daftar Pengaduan</h3>
-<table border="1">
-    <tr>
-        <th>No</th>
-        <th>NIK</th>
-        <th>Nama Pelapor</th>
-        <th>Kategori</th>
-        <th>Isi Laporan</th>
-        <th>Lokasi</th>
-        <th>Tanggal</th>
-        <th>Foto Bukti</th>
-        <th>Status</th>
-        <th>Aksi</th>
-    </tr>
-    {% for pengaduan in pengaduan_list %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ pengaduan.nik.nik }}</td>
-        <td>{{ pengaduan.nik.nama }}</td>
-        <td>{{ pengaduan.get_kategori_display }}</td>
-        <td>{{ pengaduan.isi_laporan }}</td>
-        <td>{{ pengaduan.lokasi }}</td>
-        <td>{{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</td>
-        <td>
-            {% if pengaduan.foto %}
-                <img src="{{ pengaduan.foto.url }}" alt="Bukti" width="100">
-            {% else %}
-                Tidak ada foto
-            {% endif %}
-        </td>
-        <td>
-            {% if pengaduan.status == "tunggu" %}
-                <span style="color: orange;">Belum Diproses</span>
-            {% elif pengaduan.status == "proses" %}
-                <span style="color: blue;">Sedang Diproses</span>
-            {% elif pengaduan.status == "selesai" %}
-                <span style="color: green;">Selesai</span>
-            {% else %}
-                <span style="color: red;">Tidak Diketahui</span>
-            {% endif %}
-        </td>
-        <td>
-            <a href="{% url 'detail_pengaduan' pengaduan.id_pengaduan %}">Lihat</a> |
-            <a href="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}">Ubah Status</a> |
-            <a href="{% url 'beri_tanggapan' pengaduan.id_pengaduan %}">Beri Tanggapan</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <h3>Daftar Pengaduan</h3>
+    <div class="table-container">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>No</th>
+                    <th>NIK</th>
+                    <th>Nama Pelapor</th>
+                    <th>Kategori</th>
+                    <th>Isi Laporan</th>
+                    <th>Lokasi</th>
+                    <th>Tanggal</th>
+                    <th>Foto Bukti</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>            
+            <tbody>
+                {% for pengaduan in pengaduan_list %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ pengaduan.nik.nik }}</td>
+                    <td>{{ pengaduan.nik.nama }}</td>
+                    <td>{{ pengaduan.get_kategori_display }}</td>
+                    <td>{{ pengaduan.isi_laporan }}</td>
+                    <td>{{ pengaduan.lokasi }}</td>
+                    <td class="text-center">{{ pengaduan.tgl_pengaduan|date:"Y-m-d H:i:s" }}</td>
+                    <td class="text-center">
+                        {% if pengaduan.foto %}
+                            <img src="{{ pengaduan.foto.url }}" alt="Bukti" width="80">
+                        {% else %}
+                            Tidak ada foto
+                        {% endif %}
+                    </td>
+                    <td class="status text-center {{ pengaduan.status }}">
+                        {% if pengaduan.status == "tunggu" %}
+                            <span>Belum Diproses</span>
+                        {% elif pengaduan.status == "proses" %}
+                            <span>Sedang Diproses</span>
+                        {% elif pengaduan.status == "selesai" %}
+                            <span>Selesai</span>
+                        {% else %}
+                            <span>Tidak Diketahui</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'detail_pengaduan' pengaduan.id_pengaduan %}" class="btn btn-info btn-sm">Lihat</a>
+                        <a href="{% url 'ubah_status_pengaduan' pengaduan.id_pengaduan %}" class="btn btn-warning btn-sm">Ubah</a>
+                        <a href="{% url 'beri_tanggapan' pengaduan.id_pengaduan %}" class="btn btn-success btn-sm">Tanggapi</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+</div>
 
 <script>
     var ctx = document.getElementById('grafikPengaduan').getContext('2d');
     var chart = new Chart(ctx, {
-        type: 'line',  // Menggunakan tipe grafik garis
+        type: 'line',
         data: {
-            labels: {{ tanggal_pengaduan|safe }},  // Data tanggal pengaduan
+            labels: {{ tanggal_pengaduan|safe }},
             datasets: [{
                 label: 'Jumlah Pengaduan per Hari',
-                data: {{ jumlah_per_hari|safe }},  // Data jumlah pengaduan per hari
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: {{ jumlah_per_hari|safe }},
+                borderColor: '#164863',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: false,  // Tidak mengisi area di bawah garis
+                fill: false,
                 tension: 0.1
             }]
         },
         options: {
+            responsive: true,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Tanggal'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Jumlah Pengaduan'
-                    }
-                }
+                x: { title: { display: true, text: 'Tanggal' } },
+                y: { title: { display: true, text: 'Jumlah Pengaduan' } }
             }
         }
     });
 </script>
-
 </body>
 </html>
