@@ -1,0 +1,98 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #DDF2FD;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Header */
+h2 {
+    color: #164863;
+    margin-bottom: 10px;
+}
+
+/* Form Styling */
+form {
+    background: white;
+    padding: 20px;
+    width: 50%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Fieldset */
+fieldset {
+    border: 2px solid #164863;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Legend */
+legend {
+    font-weight: bold;
+    color: #164863;
+}
+
+/* Label */
+label {
+    font-weight: bold;
+    color: #427D9D;
+}
+
+/* Input & Select */
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Textarea Styling */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Upload Foto */
+input[type="file"] {
+    border: none;
+}
+
+/* Tombol Kirim */
+button {
+    background-color: #164863;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #427D9D;
+}
+
+/* Kembali ke Dashboard */
+a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #164863;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

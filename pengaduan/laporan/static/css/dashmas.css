@@ -1,0 +1,97 @@
+/* Global Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #DDF2FD;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Header */
+h2 {
+    color: #164863;
+    margin-top: 20px;
+}
+
+/* Welcome Message */
+p {
+    font-size: 18px;
+    color: #427D9D;
+}
+
+/* Tombol Buat Pengaduan */
+.btn {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+/* Warna Tombol */
+.btn-primary {
+    background-color: #164863;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #427D9D;
+}
+
+/* Tombol Logout */
+.btn-danger {
+    background-color: #D9534F;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #C9302C;
+}
+
+/* Tabel Styling */
+table {
+    width: 80%;
+    margin: auto;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #164863;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #e3f2fd;
+}
+
+/* Tombol "Lihat Detail" */
+a[href*="detail_pengaduan"] {
+    background-color: #427D9D;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+a[href*="detail_pengaduan"]:hover {
+    background-color: #164863;
+}

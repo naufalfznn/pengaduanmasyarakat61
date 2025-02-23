@@ -4,23 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Masyarakat</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/promas.css' %}">
 </head>
 <body>
 
-<h2>Profil </h2>
-{% if masyarakat.foto_profil %}
-    <img src="{{ masyarakat.foto_profil.url }}" alt="Foto Profil" width="150">
-{% else %}
-    <p>Foto profil belum diunggah.</p>
-{% endif %}
+<div class="profile-container">
+    <h2>Profil</h2>
+    {% if masyarakat.foto_profil %}
+        <img src="{{ masyarakat.foto_profil.url }}" alt="Foto Profil" class="profile-picture">
+    {% else %}
+        <p>Foto profil belum diunggah.</p>
+    {% endif %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Simpan Perubahan</button>
-</form>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Simpan Perubahan</button>
+    </form>
 
-<a href="{% url 'dashboard_masyarakat' %}">Kembali ke Dashboard</a>
+    <a href="{% url 'dashboard_masyarakat' %}" class="back-link">Kembali ke Dashboard</a>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,88 @@
+/* Styling halaman login */
+body {
+    background-color: #DDF2FD;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container utama */
+.login-container {
+    background-color: #164863;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #DDF2FD;
+    width: 320px;
+}
+
+/* Judul */
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #DDF2FD;
+}
+
+/* Styling pesan error atau notifikasi */
+.message {
+    background-color: #9BBEC8;
+    color: #164863;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Input form */
+.login-container label {
+    display: block;
+    text-align: left;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #9BBEC8;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Tombol login */
+.login-container button {
+    width: 100%;
+    background-color: #427D9D;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.login-container button:hover {
+    background-color: #9BBEC8;
+}
+
+/* Link ke registrasi */
+.login-container p {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.login-container a {
+    color: #DDF2FD;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}

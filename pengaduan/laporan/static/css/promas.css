@@ -1,0 +1,90 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #DDF2FD;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Header */
+h2 {
+    color: #164863;
+    margin-bottom: 10px;
+}
+
+/* Profil Container */
+.profile-container {
+    background: white;
+    padding: 20px;
+    width: 50%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Foto Profil */
+.profile-picture {
+    display: block;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    border: 3px solid #164863;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Form Styling */
+form {
+    text-align: left;
+    width: 80%;
+    margin: auto;
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+/* Input Styling */
+input[type="text"],
+input[type="email"],
+input[type="file"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Tombol Simpan */
+button {
+    background-color: #164863;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #427D9D;
+}
+
+/* Kembali ke Dashboard */
+.back-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #164863;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}

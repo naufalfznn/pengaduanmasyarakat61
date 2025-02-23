@@ -1,0 +1,83 @@
+/* Styling Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #164863;
+    padding: 15px 10px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body {
+    padding-top: 70px; /* Menghindari konten tertutup navbar */
+    background-color: #DDF2FD;
+}
+
+.navbar-brand {
+    color: #DDF2FD;
+    font-size: 22px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar-brand {
+    padding-left: 25px; /* Mengurangi padding agar menu navigasi lebih terlihat jelas */
+}
+
+.navbar-right {
+    padding-right: 25px;
+}
+
+.navbar-brand:hover {
+    color: #9BBEC8;
+}
+
+.navbar-nav, .navbar-right {
+    display: flex;
+    gap: 5px;
+}
+
+.navbar-nav a, .navbar-right a {
+    color: #DDF2FD;
+    font-size: 18px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar-nav a:hover, .navbar-right a:hover {
+    background-color: #427D9D;
+    color: #164863;
+    transform: scale(1.1);
+}
+
+.btn-logout {
+    background-color: #9BBEC8;
+    color: #164863;
+    font-size: 16px;
+    padding: 8px 12px; /* Mengurangi padding agar tombol lebih kecil */
+    border-radius: 5px;
+    border: none;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+    display: inline-block; /* Pastikan tidak melebar */
+}
+
+.btn-logout:hover {
+    background-color: #DDF2FD;
+    color: #164863;
+    transform: scale(1.05); /* Kurangi efek scale biar ga terlalu besar */
+}
+
+/* Animasi Navbar Saat Scroll */
+.navbar.scrolled {
+    background-color: #427D9D;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}

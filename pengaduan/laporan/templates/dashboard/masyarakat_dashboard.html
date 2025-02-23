@@ -1,28 +1,24 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/dashmas.css' %}">
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Masyarakat</title>
+{% include "includes/navbar_masyarakat.html" %}
 </head>
 <body>
 
-    {% if role == 'admin' %}
-    {% include 'includes/navbar_admin.html' %}
-        {% elif role == 'petugas' %}
-            {% include 'includes/navbar_petugas.html' %}
-        {% elif role == 'masyarakat' %}
-            {% include 'includes/navbar_masyarakat.html' %}
-        {% else %}
-            {% include 'includes/navbar_public.html' %}
-        {% endif %}
+    <p>Selamat datang, {{ request.session.username }}!</p>
 
-
-<h2>Dashboard Masyarakat</h2>
-<p>Selamat datang, {{ request.session.username }}! <a href="{% url 'logout' %}"> Logout</a></p>
-
-
-<a href="{% url 'buat_pengaduan' %}">+ Buat Pengaduan</a>
+    <!-- Tombol Logout -->
+    <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+    
+    <!-- Tombol Buat Pengaduan -->
+    <a href="{% url 'buat_pengaduan' %}" class="btn btn-primary">+ Buat Pengaduan</a>
+    
 
 <h3>Pengaduan Saya</h3>
 <table border="1">
